@@ -84,33 +84,77 @@ public class Persona{
                     k += 1;
                 }
             }
-            //System.out.println(k);
-            if (k == processed.length){
+            if (k == processed.length) {
                 processed = makebigger(processed);
-                //System.out.println(processed.length);
             }
         }
+        // TODO k (nombres distintos)
         return processed;
+    }
+
+    public static void sort(Peers[] v){
+        sortRec(v, 0, v.length);
+    }
+
+    public static void sortRec(Peers[] v, int low, int hi){
+        if (low >= hi){return;}
+        int lim = partition(v, low, hi);
+        sortRec(v, low, lim-1);
+        sortRec(v, lim+1, hi);
+    }
+
+    public static int partition(Peers[] v, int low, int hi){
+        // Pivote inicial v[low]
+        // Empiezo a comprobar en el siguiente low+1
+        int lim = low+1;
+        for (int i = low+1; i < v.length; i++){
+            try {
+                if (v[i].getnumber() > v[low].getnumber()) {
+                    Peers temp = new Peers(v[i].getname(), v[i].getnumber());
+                    v[i] = v[lim];
+                    v[lim] = temp;
+                    lim++;
+                }
+            }catch (Exception e){}
+        }
+        Peers temp = new Peers (v[low].getname(), v[low].getnumber());
+        v[low] = v[lim-1];
+        v[lim-1] =  temp;
+        return lim - 1;
     }
 
     public static void main(String[] args){
         Persona[] personas = new Persona[0];
         try{
-            personas = leeFichero("personas_va.txt");
+            personas = leeFichero("personas_sp.txt");
         }
         catch(IOException e){
             System.out.println("Error en la apertura del archivo.");
             System.exit(1);
         }
         int NUMERO = 5;
-        String NOMBRE = "CESAR";
+        String NOMBRE = "BORJA";
         //TODO CAMBIAR FINALS Y A MAYUSCULAS EL NOMBRE
-        String date = "1/1/1974 31/12/1982";
+        String date = "1/1/1966 31/12/1966";
         String[] splitdate = date.split(" ");
         int datemin = traduceFecha(splitdate[0]);
         int datemax = traduceFecha(splitdate[1]);
         Peers[] data = process(datemin, datemax, personas);
-        //System.out.println(data.length);
+        try {
+            sort(data);
+        }catch (NullPointerException e){}
+        for (int i = 0; i < 5; i++) {
+            System.out.print(i+1 + " " + data[i].getname() + " " + data[i].getnumber());
+            System.out.println();
+        }
+        try {
+            for (int i = 0; ; i++) {
+                if (data[i].getname().equals(NOMBRE)) {
+                    System.out.println(i + 1 + " " + data[i].getname() + " " + data[i].getnumber());
+                    break;
+                }
+            }
+        }catch (NullPointerException e){System.out.println("El nombre aportado no está en los registros.");}
     }
 }
 
